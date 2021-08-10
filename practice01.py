@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_mail import Mail, Message
+from threading import Thread
 
 import os
 
@@ -145,6 +146,26 @@ def attachment():
 		msg.attach("MHrise0001.jpeg", "image/jpeg", pics.read())
 	mail.send(msg)
 	return "/attachment success"
+
+# 非同步寄送郵件
+# 使用非同步的主因在於不希望使用者在按下發送信件按鈕之後需要浪費時間等待寄送信件的程序
+# 這個等待時間會造成使用者體驗不佳，而且使用者也不需要浪費時間等待
+# 因此利用多執行緒將使用者點擊按鈕之後的信件派送程序切割
+
+@app.route("/Use_Thread")
+def Use_Thread():
+	msg = Message('Use_Thread', recipients=[os.environ.get("TEST_MAIL")])
+	msg.html = "<b>This is sent by app.route('/Use_Thread'), and is written by msg.html.</b>"
+	Thread(target=send_async_email, args=[app, msg]).start()
+	return "/Use_Thread success"
+
+# 使用多線程 target=要接續的目標函式 args=要傳送過去的參數
+# 因為 args=[app, msg] 有兩個參數 所以人方函式的參數也必須放入 app, msg
+# 必需讓程序是在相同的 Context 內，因此必需利用 app.app_context 來確保線程
+
+def send_async_email(app, msg):
+	with app.app_context():
+		mail.send(msg)
 
 if __name__ == "__main__":
     app.run(debug = True, host = "0.0.0.0", port = 3000)
