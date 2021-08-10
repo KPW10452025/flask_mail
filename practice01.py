@@ -92,7 +92,10 @@ def send():
 	# 測試用 email 可以搜尋 temporary email
 	msg = Message("Hello", recipients=["tujiqabe.ogopenoq@vintomaper.com"])
 	# 使用 msg.body 用來設定內容
-	msg.body = "This is a test email from flask-email."
+	# 亦可以使用 msg.html 來設定內容
+	# 但要注意的是，如果使用 msg.html 會蓋掉 msg.body 導致 msg.body 的內容不會顯示
+	msg.body = "This is from msg.body"
+	msg.html = "<b>This is from msg.html</b>"
 	mail.send(msg)
 	return "success"
 
