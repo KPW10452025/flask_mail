@@ -106,15 +106,31 @@ def send():
 # 當 app.config["MAIL_MAX_EMAILS"] = 10 時，無論 users(或者各種字典、資料庫等)有多少筆資料，結果只會寄送10次
 @app.route("/bulk")
 def bulk():
-	# 這裡的 users 是一個字典，也可以是連接的資料庫等，為方便說明這裡只放一個
-	users = [{"name" : "Tom", "email" : "tujiqabe.ogopenoq@vintomaper.com"}]
+	# 這裡的 users 是一個字典，也可以是連接的資料庫等
+	users = [{"name" : "Tom", "email" : "tujiqabe.ogopenoq@vintomaper.com"},
+	         {"name" : "Dan", "email" : "tujiqabe2.ogopenoq@vintomaper.com"},
+	         {"name" : "Ken", "email" : "tujiqabe3.ogopenoq@vintomaper.com"},
+	         {"name" : "Sue", "email" : "tujiqabe4.ogopenoq@vintomaper.com"}]
 	with mail.connect() as conn:
 		for user in users:
-			msg = Message("Bilk!", recipients=[user["email"]])
+			msg = Message("Bulk!", recipients=[user["email"]])
 			msg.body = "This is sent by app.route('/bulk'), and is written by msg.body."
 			conn.send(msg)
 	return "/bulk success"
 
+# 如果今天我要寄給很多人，但又不想被 MAIL_MAX_EMAILS 限制時
+# 可以用以下方法實現
+# 把 recipients=[user["email"]] 改成 recipients=[user.email]
+# 但是這個說明力並無法運作，因為 user.email 是連接資料庫的語法，這個文檔並沒有設計資料庫
+@app.route("/bulk_2")
+def bulk_2():
+	users = [{"name" : "Tom", "email" : "tujiqabe.ogopenoq@vintomaper.com"}]
+	with mail.connect() as conn:
+		for user in users:
+			msg = Message("Bulk_2", recipients=[user.email])
+			msg.body = "This is sent by app.route('/bulk_2'), and is written by msg.body."
+			conn.send(msg)
+	return "/bulk_2 success"
 
 if __name__ == "__main__":
     app.run(debug = True, host = "0.0.0.0", port = 3000)
