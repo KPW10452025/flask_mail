@@ -132,5 +132,19 @@ def bulk_2():
 			conn.send(msg)
 	return "/bulk_2 success"
 
+# 如何寄送一個夾帶郵件的信 How to add attachments to the message
+# 我在專案檔案夾中新增一個名為 MHrise0001.jpeg 的圖片
+@app.route("/attachment")
+def attachment():
+	# temporary email 郵件無法收取 attachment，這裡我使用自己的信箱
+	# 此信箱已被隱藏在環境變數，所以需要 os.environ.get() 調用
+	msg = Message("Attachment", recipients=[os.environ.get("TEST_MAIL")])
+	msg.html = "<b>This is sent by app.route('/attachment'), and is written by msg.html.</b>"
+	# open_resource 是 flask 用來 open resources 的語法
+	with app.open_resource("MHrise0001.jpeg") as pics:
+		msg.attach("MHrise0001.jpeg", "image/jpeg", pics.read())
+	mail.send(msg)
+	return "/attachment success"
+
 if __name__ == "__main__":
     app.run(debug = True, host = "0.0.0.0", port = 3000)
