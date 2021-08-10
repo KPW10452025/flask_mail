@@ -81,6 +81,7 @@ mail = Mail(app) # 必須寫在 app.config 後面
 # mail = Mail()
 # mail.init_app(app)
 
+# 寄一封信給一個人
 @app.route("/send")
 def send():
 	# msg = Message("Hello", sender="from@example.com", recipients=["to@example.com"])
@@ -97,7 +98,23 @@ def send():
 	msg.body = "This is from msg.body"
 	msg.html = "<b>This is from msg.html</b>"
 	mail.send(msg)
-	return "success"
+	return "/send success"
+
+# 寄一封信給一堆人
+# 運用 with 開啟一個 connection 專門用來不斷寄信
+# 此方法的特點為，這個 connection 寄件次數會受到 app.config["MAIL_MAX_EMAILS"] 所限制
+# 當 app.config["MAIL_MAX_EMAILS"] = 10 時，無論 users(或者各種字典、資料庫等)有多少筆資料，結果只會寄送10次
+@app.route("/bulk")
+def bulk():
+	# 這裡的 users 是一個字典，也可以是連接的資料庫等，為方便說明這裡只放一個
+	users = [{"name" : "Tom", "email" : "tujiqabe.ogopenoq@vintomaper.com"}]
+	with mail.connect() as conn:
+		for user in users:
+			msg = Message("Bilk!", recipients=[user["email"]])
+			msg.body = "This is sent by app.route('/bulk'), and is written by msg.body."
+			conn.send(msg)
+	return "/bulk success"
+
 
 if __name__ == "__main__":
     app.run(debug = True, host = "0.0.0.0", port = 3000)
