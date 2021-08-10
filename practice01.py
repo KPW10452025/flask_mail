@@ -1,21 +1,12 @@
-from flask_mail import Mail, Message
 from flask import Flask
+from flask_mail import Mail, Message
 
 import os
 
 from dotenv import load_dotenv # 利用 dotenv 載入環境變數
 load_dotenv() # dotenv 基本語法 # take environment variables from .env
 
-
-# 以此方式，所有的郵件設置會一次性渲染
-app = Flask(__name__)
-mail = Mail(app)
-
-# 如果你有不同專案要走不同郵件設置的話，用此方式較佳
-# 如果你使用工廠模式的話，也會以此方式來做初始化
-# mail = Mail()
-# app = Flask(__name__)
-# mail.init_app(app)
+app = Flask(__name__) # 必須寫在 app.config 前面
 
 app.config["MAIL_SERVER"] = 'smtp.gmail.com'
 # app.config["MAIL_SERVER"] = 默認為'localhost'
@@ -51,17 +42,17 @@ app.config["MAIL_USE_SSL"] = True
 #     app.debug = True
 #     app.run()
 
-app.config["MAIL_USERNAME"] = 'kuopowei@gmail.com'
+app.config["MAIL_USERNAME"] = os.environ.get("GMAIL_USERNAME")
 # app.config["MAIL_USERNAME"] = 默認為 None
 # 發件人的用戶名 
 # 如果有設置環境變數則可以使用 os.environ.get('MAIL_USERNAME') 取得
 
-app.config["MAIL_PASSWORD"] = "xrxakwpvfxchwvvk"
+app.config["MAIL_PASSWORD"] = os.environ.get("GMAIL_PASSWORD")
 # app.config["MAIL_PASSWORD"] = 默認為 None
 # 發件人的密碼 
 # 如果有設置環境變數則可以使用 os.environ.get('MAIL_PASSWORD') 取得
 
-app.config["MAIL_DEFAULT_SENDER"] = None
+app.config["MAIL_DEFAULT_SENDER"] = os.environ.get("GMAIL_USERNAME")
 # 默認為 None
 # 設置默認發件人 
 
@@ -81,6 +72,24 @@ app.config["MAIL_ASCII_ATTACHMENTS"] = False
 # 如果設置為true，則將附加的文件名轉換為ASCII
 # 現今常用的編碼為 unicode
 # ascii 只有英文，而且字數少，除非伺服器限定使用 ascii，不然都默認 False
+
+# 以此方式，所有的郵件設置會一次性渲染
+mail = Mail(app) # 必須寫在 app.config 後面
+
+# 如果你有不同專案要走不同郵件設置的話，用此方式較佳
+# 如果你使用工廠模式的話，也會以此方式來做初始化
+# mail = Mail()
+# mail.init_app(app)
+
+@app.route("/send")
+def send():
+	# msg = Message("Hello", sender="from@example.com", recipients=["to@example.com"])
+	# 因為已經在 config 設定 app.config["MAIL_DEFAULT_SENDER"]
+	# 所以在這裡可以不用再次設定 sender
+	# 測試用 email 可以搜尋 temporary email
+	msg = Message("Hello", recipients=["tujiqabe.ogopenoq@vintomaper.com"])
+	mail.send(msg)
+	return "success"
 
 if __name__ == "__main__":
     app.run(debug = True, host = "0.0.0.0", port = 3000)
