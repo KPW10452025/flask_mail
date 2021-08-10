@@ -84,10 +84,15 @@ mail = Mail(app) # 必須寫在 app.config 後面
 @app.route("/send")
 def send():
 	# msg = Message("Hello", sender="from@example.com", recipients=["to@example.com"])
+	# 第一個參數 "Hello" 是郵件的標題
+	# 第二個參數 sender 是寄件人
 	# 因為已經在 config 設定 app.config["MAIL_DEFAULT_SENDER"]
 	# 所以在這裡可以不用再次設定 sender
+	# 第三個參數 recipients 是收件人
 	# 測試用 email 可以搜尋 temporary email
 	msg = Message("Hello", recipients=["tujiqabe.ogopenoq@vintomaper.com"])
+	# 使用 msg.body 用來設定內容
+	msg.body = "This is a test email from flask-email."
 	mail.send(msg)
 	return "success"
 
