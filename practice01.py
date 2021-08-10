@@ -148,3 +148,16 @@ def attachment():
 
 if __name__ == "__main__":
     app.run(debug = True, host = "0.0.0.0", port = 3000)
+
+# 補充：如何查詢 Gmail 的外寄郵件(SMTP)伺服器的 config
+# 開啟 Gmail 的 "設定"
+# 點選 "轉寄和 POP/IMAP"
+# 找到下方 "IMAP 存取" 並點選 "瞭解詳情"
+# 這時候會來到新頁面，尋找 "外寄郵件 (SMTP) 伺服器"
+# 會看到以下資料
+# smtp.gmail.com
+# 需要安全資料傳輸層 (SSL)：是
+# 需要傳輸層安全性 (TLS)：是 (如果可用)
+# 需要驗證：是
+# 安全資料傳輸層 (SSL) 通訊埠：465
+# 傳輸層安全性 (TLS)/STARTTLS 通訊埠：587
